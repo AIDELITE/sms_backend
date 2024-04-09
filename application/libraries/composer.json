@@ -1,0 +1,10 @@
+{
+  "require": {
+    "africastalking/africastalking": "^3.0",
+    "beyonic/beyonic-php": "^0.0.9",
+    "firebase/php-jwt": "^5.3",
+    "instasent/sms-counter-php": "^0.4",
+    "guzzlehttp/guzzle": "^6.2",
+    "pear/http_request2": "^2.5"
+  }
+}
