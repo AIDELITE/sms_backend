@@ -103,6 +103,28 @@ class Utils extends CI_Controller
         $feedback['cost'] = $user['sms_rate'];
         echo json_encode($feedback);
     }
+
+    public function totalFloatBalance()
+    {
+        
+        if ($this->isAuthenticated == false) {
+            $this->output->set_status_header(401);
+            $feedback = [
+                'success' => false,
+                'error' => true,
+                'message' => 'Access Denied, UnAuthorized'
+            ];
+            return $this->output->set_output(json_encode(($feedback)));
+        }
+        $user_id = $this->user['id'];
+        $user = $this->get_user(intval($user_id));
+
+        $feedback['data'] = $this->transaction_model->totalFloatBalance();
+        $feedback['success'] = true;
+        $feedback['cost'] = $user['sms_rate'];
+        echo json_encode($feedback);
+    }
+
      public function creditBalance2()
     {
         if ($this->isAuthenticated == false) {
@@ -127,5 +149,21 @@ class Utils extends CI_Controller
     {
         $user = $this->auth_model->get_user($id);
         return $user;
+    }
+
+    public function get_total_connected_saccos(){
+        if ($this->isAuthenticated == false) {
+            $this->output->set_status_header(401);
+            $feedback = [
+                'success' => false,
+                'error' => true,
+                'message' => 'Access Denied, UnAuthorized'
+            ];
+            return $this->output->set_output(json_encode(($feedback)));
+        }
+
+        $feedback['data'] = $this->user_model->getTotalConnectedSaccos();
+        $feedback['success'] = true;
+        echo json_encode($feedback);
     }
 }

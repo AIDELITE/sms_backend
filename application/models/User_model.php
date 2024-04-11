@@ -10,6 +10,7 @@ class User_model extends CI_Model
         //$this->load->database();
 
         $this->table = 'user u';
+        $this->usertable = 'user u';
     }
 
     public function email_exists($email)
@@ -37,6 +38,17 @@ class User_model extends CI_Model
         if ($filter) {
             $this->db->where($filter);
         }
+
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
+    public function getTotalConnectedSaccos()
+    {   
+        $this->db->select('COUNT(*) AS "total"')
+        ->from($this->usertable)
+        ->where('user_type_id',2);
 
         $query = $this->db->get();
 

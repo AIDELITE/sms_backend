@@ -1,15 +1,9 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-/**
- * Description of User
- *
- * @author Reagan Ajuna
- */
-
 use AfricasTalking\SDK\AfricasTalking;
 use Instasent\SMSCounter\SMSCounter;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client; 
 
 class Sms extends CI_Controller
 {
@@ -68,7 +62,9 @@ class Sms extends CI_Controller
 
         $this->load->library('form_validation');
 
+        //pickes sent data from the api
         $post_data = json_decode(file_get_contents('php://input'), true);
+
         if (!empty($post_data)) {
             $this->form_validation->set_data($post_data);
         } else {
@@ -111,11 +107,10 @@ class Sms extends CI_Controller
             }
             // send sms from here
             /*
-
             2. check if acc_balance is enough and deduct cost
             3. update messages and transaction table
             4. send sms
-             */
+            */
             $user_id = $this->user_id;
             $user = $this->user;
             $balance = $this->transaction_model->accountBalance($user_id);
@@ -212,12 +207,12 @@ class Sms extends CI_Controller
                         $update_array = $result['data']->SMSMessageData->Recipients;
                         $this->message_model->update($update_array);
                         $this->transaction_model->update($update_array);
-						$feedback = [
-							'message' => $result['status'],
-							'cost' => $sending_charges,
-							'status' => true,
-							'success' => true
-						];
+                            $feedback = [
+                                'message' => $result['status'],
+                                'cost' => $sending_charges,
+                                'status' => true,
+                                'success' => true
+                            ];
                         http_response_code(200);
                     } catch (Exception $e) {
                         $feedback['message'] = $e->getMessage();

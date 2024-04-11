@@ -111,4 +111,13 @@ class Transaction_model extends CI_Model
 
         return $query->row_array();
     }
+
+    public function totalFloatBalance(){
+        $this->db->select('((IFNULL(SUM(CREDIT),0))-(IFNULL(SUM(DEBIT),0))) AS acc_balance')
+        ->from($this->table)
+        ->where('status', 1);
+        $query = $this->db->get();
+
+        return $query->row_array();
+    }
 }
