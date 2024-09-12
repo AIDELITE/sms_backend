@@ -16,6 +16,7 @@ class Utils extends CI_Controller
         $this->load->model('auth_model');
         $this->load->model('user_model');
         $this->load->model('transaction_model');
+        $this->load->model('message_model');
         $this->load->library('check_auth');
 
         // check if authenticated
@@ -122,6 +123,40 @@ class Utils extends CI_Controller
         $feedback['data'] = $this->transaction_model->totalFloatBalance();
         $feedback['success'] = true;
         $feedback['cost'] = $user['sms_rate'];
+        echo json_encode($feedback);
+    }
+
+    public function totalDepleted()
+    {
+        if ($this->isAuthenticated == false) {
+            $this->output->set_status_header(401);
+            $feedback = [
+                'success' => false,
+                'error' => true,
+                'message' => 'Access Denied, UnAuthorized'
+            ];
+            return $this->output->set_output(json_encode(($feedback)));
+        }
+
+        $feedback['data'] = $this->user_model->getTotalDepleted();
+        $feedback['success'] = true;
+        echo json_encode($feedback);
+    }
+
+    public function totalsentmessages()
+    {
+        if ($this->isAuthenticated == false) {
+            $this->output->set_status_header(401);
+            $feedback = [
+                'success' => false,
+                'error' => true,
+                'message' => 'Access Denied, UnAuthorized'
+            ];
+            return $this->output->set_output(json_encode(($feedback)));
+        }
+
+        $feedback['data'] = $this->message_model->get_total_sent();
+        $feedback['success'] = true;
         echo json_encode($feedback);
     }
 

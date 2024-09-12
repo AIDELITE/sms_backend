@@ -54,6 +54,16 @@ class Transaction_model extends CI_Model
         return $query->result_array();
     }
 
+    public function getall()
+    {
+        $this->db->select('id, user_id, type, IFNULL(CREDIT,0) AS CREDIT,IFNULL(DEBIT,0) AS DEBIT , narrative, date_created,status')
+            ->from($this->table);
+
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
     public function create_deposit_request($data)
     {
         $insert_id = $this->db->insert('deposit_transaction_status', $data);
@@ -71,6 +81,7 @@ class Transaction_model extends CI_Model
 
         return $pending;
     }
+
 
     public function update_deposit_request($request_id, $data, $refNo = false)
     {

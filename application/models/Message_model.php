@@ -49,6 +49,17 @@ class Message_model extends CI_Model
         return $query->row_array();
     }
 
+    //added this function
+    public function get_total_sent(){
+        $todaydate = date('Y-m-d');
+        $this->db->select('(SELECT COUNT(*) FROM `message`  WHERE (`statusCode`="100" OR `statusCode`="101" OR `statusCode`="102") AND DATE(`date_created`)=CURDATE()) AS "sent"')
+            ->select('(SELECT COUNT(*) FROM `message`  WHERE (`statusCode`!="100" AND `statusCode`!="101" AND `statusCode`!="102") AND DATE(`date_created`)=CURDATE()) AS "failed"')
+            ->from($this->table);
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+    //upto here
+
     public function create($data)
     {
         $this->db->insert($this->table, $data);
@@ -58,6 +69,8 @@ class Message_model extends CI_Model
 
         return ['message' => 'Something went wrong, try again', 'status' => false, 'error' => true];
     }
+
+    //upto here
 
      public function update($data)
     {   
@@ -73,7 +86,6 @@ class Message_model extends CI_Model
         }
        return true;
     }
-
 
 
     public function updateSmsStatus($status,$transactionNo)

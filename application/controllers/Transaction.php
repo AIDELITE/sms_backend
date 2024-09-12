@@ -68,6 +68,20 @@ class Transaction extends CI_Controller
         echo json_encode($data);
     }
 
+    //added this line to handle all incomes
+
+    public function allIncomes()
+    {
+        $post_data = json_decode(file_get_contents('php://input'), true);
+        // if($post_data->data_type)
+        // {
+
+        // }
+        //$data['data'] = $this->transaction_model->getall();
+        echo json_encode($post_data);
+    }
+    //upto here
+
     public function deposit()
     {
 

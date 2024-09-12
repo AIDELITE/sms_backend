@@ -48,7 +48,7 @@ class Message extends CI_Controller
     # Get User Messsages
     public function user()
     {
-        $data['data'] = $this->message_model->get_messages("m.user_id = '{$this->user['id']}'");
+        $data['data'] = $this->message_model->get_messages();
         echo json_encode($data);
     }
     # Get single Messsage

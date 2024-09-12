@@ -10,7 +10,8 @@ class User_model extends CI_Model
         //$this->load->database();
 
         $this->table = 'user u';
-        $this->usertable = 'user u';
+        $this->usertable = 'user';
+        $this->transactiontable = 'transaction';
     }
 
     public function email_exists($email)
@@ -44,6 +45,7 @@ class User_model extends CI_Model
         return $query->result_array();
     }
 
+//STARTED FROM HERE
     public function getTotalConnectedSaccos()
     {   
         $this->db->select('COUNT(*) AS "total"')
@@ -54,7 +56,33 @@ class User_model extends CI_Model
 
         return $query->result_array();
     }
+    
+    public function getTotalDepleted()
+    { 
+        $items_counter = 0;
+        $query1 = $this->db->select('id')
+                ->from('user')
+                ->where('user_type_id',2)
+                ->get()
+                ->result();
+        
 
+        foreach($query1 as $items)
+        {
+            $query2 = $this->db->select('SUM(IFNULL(CREDIT,0))-SUM(IFNULL(DEBIT,0)) as "total"')
+                            ->from('transaction')
+                            ->where('user_id',$items->id)
+                            ->get()
+                            ->result_array();
+            
+            if($query2[0]['total'] <=0){
+                $items_counter++;
+            }
+        }
+        return $items_counter;
+    }
+
+//UPTO HERE
 
     public function get_user_types()
     {

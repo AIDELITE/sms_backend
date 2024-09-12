@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 use AfricasTalking\SDK\AfricasTalking;
 use Instasent\SMSCounter\SMSCounter;
-use GuzzleHttp\Client; 
+use GuzzleHttp\Client;
 
 class Sms extends CI_Controller
 {
@@ -151,19 +151,22 @@ class Sms extends CI_Controller
                 if ($acc_balance < $sending_charges) {
                     // Donot send
                     $feedback = [
+						'message' => 'Your SMS Float balance is Low',
+						'cost'=>'0',
                         'status' => false,
+						'success' => false,
                         'error' => true,
-                        'success' => false,
-                        'message' => 'Your account balance is Low'
+						'statusCode'=>'500',
+						'openingBalance' => '0'
                     ];
                     //http_response_code(403);
                     echo json_encode($feedback);
                     return;
                 } else {
-                  $this->db->trans_begin();
-                  $eachSmsCharge = $sms_rate*$result['messages'];
-                  foreach ($receipts_array as $key => $value) {
-                    // Update transactions table
+                $this->db->trans_begin();
+                $eachSmsCharge = $sms_rate * $result['messages'];
+                foreach ($receipts_array as $key => $value) {
+                // Update transactions table
                     $trans_data = [
                         'date_created' => date("Y-m-d H:i:s"),
                         'type' => 'DEBIT',
@@ -184,10 +187,10 @@ class Sms extends CI_Controller
                         'user_id' => $user_id
                     ];
                     $this->message_model->create($message_data);
-                  }
-                  if ($this->db->trans_status() === TRUE) {
-                      $this->db->trans_commit();
-                    // sending sms
+                }
+                if ($this->db->trans_status() === TRUE) {
+                    $this->db->trans_commit();
+// sending sms=====================***********************************=========================================
                     try {
                         //Thats it, hit send and we'll take care of the rest
                         $receipients = implode(",", $receipts_array);
@@ -203,51 +206,57 @@ class Sms extends CI_Controller
                         // send
                         //$result['status'] = "Message Sent!";
                         $result = $this->sms->send($data);
-
                         $update_array = $result['data']->SMSMessageData->Recipients;
                         $this->message_model->update($update_array);
                         $this->transaction_model->update($update_array);
-                            $feedback = [
-                                'message' => $result['status'],
-                                'cost' => $sending_charges,
-                                'status' => true,
-                                'success' => true
-                            ];
+                        $feedback = [
+                            'message' => $update_array[0]->status,
+                            'cost' => $sending_charges,
+                            'status' => true,
+                            'success' => true,
+							'error'=> false,
+                            'statusCode'=>$update_array[0]->statusCode,
+							'openingBalance' => $acc_balance
+                        ];
                         http_response_code(200);
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $feedback['message'] = $e->getMessage();
+						$feedback['cost'] = 0;
                         $feedback['status'] = false;
                         $feedback['success'] = false;
                         $feedback['error'] = true;
-
+                        $feedback['statusCode'] = "500";
+						$feedback['openingBalance'] = "0";
                         $this->db->trans_rollback();
                         //http_response_code(500);
                         echo json_encode($feedback);
-
                         return;
                     }
 
-                  }else {
-
-                          $this->db->trans_rollback();
-                          $feedback = [
-                              'message' => 'Something went wrong',
-                              'status' => false,
-                              'success' => false,
-                              'error' => true
-                          ];
-
-                  }
-
+                }else {
+                        $this->db->trans_rollback();
+                        $feedback = [
+                            'message' => 'Something went wrong',
+							'cost' => '0',
+                            'status' => false,
+                            'success' => false,
+                            'error' => true,
+                            'statusCode' => "500",
+							'openingBalance' => "0"
+                        ];
+                }
 
                 }
             } else {
                 $invalid_numbers_result = implode(",", $invalid_numbers);
                 $feedback = [
                     'message' => 'Incorrect Phone Number Format! Numbers must start with +256 or 0 and must have the correct length of Ugandan Phone Numbers. Invalid Numbers =>[ ' . $invalid_numbers_result . ' ]',
+					'cost' => '0',
                     'status' => false,
                     'success' => false,
-                    'error' => true
+                    'error' => true,
+                    'statusCode' => "500",
+					'openingBalance' => "0"
                 ];
             }
         }
